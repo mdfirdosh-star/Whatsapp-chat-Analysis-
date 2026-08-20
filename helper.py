@@ -49,6 +49,8 @@ def create_wordcolud(select_user,df):
         return " ".join(y)
     # remove the stopwords for english
     from nltk.corpus import stopwords
+    import nltk
+    nltk.download('stopwords')
     def remove_stop_words_english(message):
         y=[]
         for i in message.lower().split():
