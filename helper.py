@@ -40,7 +40,7 @@ def create_wordcolud(select_user,df):
     temp=temp[temp["message"] != "<Media omitted>"]
     # remove the stopwords for hinglish 
     def remove_stop_words_hinglish(message):
-        with open(r"C:\Users\mdfir\Downloads\stop_hinglish.txt", "r", encoding="utf-8") as f:
+        with open(r"stop_hinglish.txt", "r", encoding="utf-8") as f:
           stop_words = f.read()
         y=[]
         for i in message.lower().split():
