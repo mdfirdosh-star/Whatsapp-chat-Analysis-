@@ -70,9 +70,8 @@ if uploaded_file is not None:
 
         with col4:
             st.header("Total Links")
-            st.title(len(links))
+            st.title(links)
 
-        st.dataframe(links)
 
         
         # 2. MOST BUSY USER
