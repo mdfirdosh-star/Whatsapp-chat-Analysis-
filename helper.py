@@ -78,7 +78,7 @@ def most_common_word(select_user, df):
     temp = temp[temp["message"] != "<Media omitted>"]
 
     # Stop words file
-    with open(r"C:\Users\mdfir\Downloads\stop_hinglish.txt", "r", encoding="utf-8") as f:
+    with open(r"stop_hinglish.txt", "r", encoding="utf-8") as f:
         stop_words = f.read()
 
     words = []
