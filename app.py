@@ -14,18 +14,93 @@ import matplotlib.pyplot as plt
 st.title("Whatsapp Chat Analyzer")
 st.sidebar.title("Whatsapp Chat Analyzer")
 
-uploaded_file = st.sidebar.file_uploader("Choose a file")
+
+# =========================================================
+# STREAMLIT FILE UPLOADER
+# =========================================================
+
+uploaded_file = st.sidebar.file_uploader(
+    "Choose a ZIP file",
+    type=["zip"]
+)
+
+
+# =========================================================
+# ZIP FILE PROCESSING
+# =========================================================
 
 if uploaded_file is not None:
 
-    # Read file
-    bytes_data = uploaded_file.getvalue()
-    data = bytes_data.decode("utf-8")
+    try:
 
-    # Preprocess
-    df = preprocess(data)
+        # ZIP file open
+        with zipfile.ZipFile(
+            uploaded_file,
+            "r"
+        ) as zip_ref:
 
-    st.dataframe(df)
+            # ZIP ke andar files
+            files = zip_ref.namelist()
+
+            st.write(
+                "Files inside ZIP:",
+                files
+            )
+
+            # TXT files find
+            txt_files = [
+                file
+                for file in files
+                if file.lower().endswith(".txt")
+            ]
+
+            # TXT nahi mili
+            if len(txt_files) == 0:
+
+                st.error(
+                    "ZIP ke andar .txt file nahi mili."
+                )
+
+            else:
+
+                # First TXT file
+                txt_file = txt_files[0]
+
+                st.success(
+                    f"Chat file found: {txt_file}"
+                )
+
+                # TXT file read
+                bytes_data = zip_ref.read(
+                    txt_file
+                )
+
+                # Decode
+                data = bytes_data.decode(
+                    "utf-8",
+                    errors="replace"
+                )
+
+                # Preprocess
+                df = preprocess(data)
+
+                # DataFrame show
+                st.dataframe(
+                    df,
+                    use_container_width=True
+                )
+
+    except zipfile.BadZipFile:
+
+        st.error(
+            "Uploaded file valid ZIP file nahi hai."
+        )
+
+    except Exception as e:
+
+        st.error(
+            f"Error: {e}"
+        )
 
     # User list
     user_list = df["user"].unique().tolist()
