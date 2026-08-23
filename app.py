@@ -2,7 +2,6 @@ import streamlit as st
 import zipfile
 
 from preprocessing import preprocess
-
 from helper import (
     fatch_stats,
     most_busy_users,
@@ -19,52 +18,67 @@ st.title("Whatsapp Chat Analyzer")
 st.sidebar.title("Whatsapp Chat Analyzer")
 
 
-# STREAMLIT FILE UPLOADER
-
+# =========================================================
+# FILE UPLOADER
+# =========================================================
 
 uploaded_file = st.sidebar.file_uploader(
-    "Choose a ZIP file",
-    type=["zip"]
+    "Choose a file",
+    type=["txt", "zip"]
 )
 
 
-
-# ZIP FILE PROCESSING
-
+# =========================================================
+# FILE PROCESSING
+# =========================================================
 
 if uploaded_file is not None:
 
     try:
 
-        # ZIP file open
-        with zipfile.ZipFile(
-            uploaded_file,
-            "r"
-        ) as zip_ref:
+        # =================================================
+        # TXT FILE
+        # =================================================
 
-            # ZIP ke andar files
-            files = zip_ref.namelist()
+        if uploaded_file.name.lower().endswith(".txt"):
 
-            st.write(
-                "Files inside ZIP:",
-                files
+            bytes_data = uploaded_file.getvalue()
+
+            data = bytes_data.decode(
+                "utf-8",
+                errors="replace"
             )
 
-            # TXT files find
-            txt_files = [
-                file
-                for file in files
-                if file.lower().endswith(".txt")
-            ]
 
-            # TXT nahi mili
-            if len(txt_files) == 0:
+        # =================================================
+        # ZIP FILE
+        # =================================================
 
-                st.error(
-                    "ZIP ke andar .txt file nahi mili."
-                )
+        elif uploaded_file.name.lower().endswith(".zip"):
 
-            else:
+            with zipfile.ZipFile(
+                uploaded_file,
+                "r"
+            ) as zip_ref:
+
+                # ZIP ke andar files
+                files = zip_ref.namelist()
+
+                # TXT files find
+                txt_files = [
+                    file
+                    for file in files
+                    if file.lower().endswith(".txt")
+                    and not file.endswith("/")
+                ]
+
+                if len(txt_files) == 0:
+
+                    st.error(
+                        "ZIP ke andar .txt WhatsApp chat nahi mili."
+                    )
+
+                    st.stop()
 
                 # First TXT file
                 txt_file = txt_files[0]
@@ -73,7 +87,7 @@ if uploaded_file is not None:
                     f"Chat file found: {txt_file}"
                 )
 
-                # TXT file read
+                # TXT read
                 bytes_data = zip_ref.read(
                     txt_file
                 )
@@ -84,19 +98,22 @@ if uploaded_file is not None:
                     errors="replace"
                 )
 
-                # Preprocess
-                df = preprocess(data)
 
-                # DataFrame show
-                st.dataframe(
-                    df,
-                    use_container_width=True
-                )
+        # =================================================
+        # PREPROCESS
+        # =================================================
+
+        df = preprocess(data)
+
+        st.dataframe(
+            df,
+            use_container_width=True
+        )
 
 
-       
+        # =================================================
         # USER LIST
-        
+        # =================================================
 
         user_list = df["user"].unique().tolist()
 
@@ -104,12 +121,16 @@ if uploaded_file is not None:
             user_list.remove("group_notification")
 
         user_list.sort()
-        user_list.insert(0, "overall")
+
+        user_list.insert(
+            0,
+            "overall"
+        )
 
 
-       
+        # =================================================
         # SELECT USER
-        
+        # =================================================
 
         select_user = st.sidebar.selectbox(
             "Show analysis wrt",
@@ -117,16 +138,17 @@ if uploaded_file is not None:
         )
 
 
-     
-        # SHOW ANALYSIS BUTTON
-       
+        # =================================================
+        # SHOW ANALYSIS
+        # =================================================
 
-        if st.sidebar.button("Show Analysis"):
+        if st.sidebar.button(
+            "Show Analysis"
+        ):
 
-
-            
+            # =============================================
             # 1. STATISTICS
-            
+            # =============================================
 
             num_message, words, media_files, links = fatch_stats(
                 select_user,
@@ -152,15 +174,19 @@ if uploaded_file is not None:
                 st.title(links)
 
 
-           
+            # =============================================
             # 2. MOST BUSY USER
-         
+            # =============================================
 
             if select_user == "overall":
 
-                st.title("Most Busy User")
+                st.title(
+                    "Most Busy User"
+                )
 
-                x, new_df = most_busy_users(df)
+                x, new_df = most_busy_users(
+                    df
+                )
 
                 col1, col2 = st.columns(2)
 
@@ -189,11 +215,13 @@ if uploaded_file is not None:
                     )
 
 
-            
+            # =============================================
             # 3. WORDCLOUD
-            
+            # =============================================
 
-            st.title("WordCloud")
+            st.title(
+                "WordCloud"
+            )
 
             df_wc_d = create_wordcolud(
                 select_user,
@@ -204,18 +232,22 @@ if uploaded_file is not None:
                 figsize=(10, 6)
             )
 
-            ax.imshow(df_wc_d)
+            ax.imshow(
+                df_wc_d
+            )
 
             ax.axis("off")
 
             st.pyplot(fig)
 
 
-            
+            # =============================================
             # 4. MOST COMMON WORDS
-           
+            # =============================================
 
-            st.title("Most Common Words")
+            st.title(
+                "Most Common Words"
+            )
 
             df_m = most_common_word(
                 select_user,
@@ -244,11 +276,13 @@ if uploaded_file is not None:
             )
 
 
-            
+            # =============================================
             # 5. EMOJIS
-            
+            # =============================================
 
-            st.title("Show the Emojis")
+            st.title(
+                "Show the Emojis"
+            )
 
             emoji_df = fatch_emojis(
                 select_user,
@@ -266,7 +300,9 @@ if uploaded_file is not None:
 
             with col2:
 
-                st.header("Emoji Pie Chart")
+                st.header(
+                    "Emoji Pie Chart"
+                )
 
                 if emoji_df.empty:
 
@@ -276,7 +312,9 @@ if uploaded_file is not None:
 
                 else:
 
-                    top_emoji = emoji_df.head(10)
+                    top_emoji = emoji_df.head(
+                        10
+                    )
 
                     fig, ax = plt.subplots(
                         figsize=(6, 5)
@@ -297,11 +335,13 @@ if uploaded_file is not None:
                     plt.close(fig)
 
 
-           
+            # =============================================
             # 6. MOST BUSY MONTH
-            
+            # =============================================
 
-            st.title("Most Busy Month")
+            st.title(
+                "Most Busy Month"
+            )
 
             timelines = most_busy_month(
                 select_user,
@@ -349,14 +389,10 @@ if uploaded_file is not None:
                 st.pyplot(fig)
 
 
-  
-    # ZIP ERROR
-   
-
     except zipfile.BadZipFile:
 
         st.error(
-            "Uploaded file valid ZIP file nahi hai."
+            "Uploaded ZIP file valid nahi hai."
         )
 
     except Exception as e:
