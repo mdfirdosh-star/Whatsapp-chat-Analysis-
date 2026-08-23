@@ -391,18 +391,18 @@ if uploaded_file is not None:
             # 6. MOST BUSY MONTH
             # =============================================
 
-         st.title(
+          st.title(
                 "Most Busy Year"
             )
 
-         timelines = most_busy_month(
+          timelines = most_busy_month(
                 select_user,
                 df
             )
 
             col1, col2 = st.columns(2)
 
-         with col1:
+          with col1:
 
                 st.title(
                     "Most Busy Year Graph"
@@ -421,7 +421,7 @@ if uploaded_file is not None:
 
                 st.pyplot(fig)
 
-         with col2:
+          with col2:
 
                 st.title(
                     "Most Busy year Bar Plot"
