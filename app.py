@@ -171,7 +171,9 @@ if uploaded_file is not None:
 
             with col4:
                 st.header("Total Links")
-                st.title(links)
+                st.title(len(links))
+            st.title("Show The Links DataFrame")
+            st.dataframe(links)
 
 
             # =============================================
