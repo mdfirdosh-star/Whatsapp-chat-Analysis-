@@ -387,60 +387,6 @@ if uploaded_file is not None:
                 )
 
                 st.pyplot(fig)
-           # =============================================
-            # 6. MOST BUSY MONTH
-            # =============================================
-
-          st.title(
-                "Most Busy Year"
-            )
-
-          timelines = most_busy_month(
-                select_user,
-                df
-            )
-
-            col1, col2 = st.columns(2)
-
-          with col1:
-
-                st.title(
-                    "Most Busy Year Graph"
-                )
-
-                fig, ax = plt.subplots()
-
-                ax.plot(
-                    timelines["year"],
-                    timelines["message"]
-                )
-
-                plt.xticks(
-                    rotation=90
-                )
-
-                st.pyplot(fig)
-
-          with col2:
-
-                st.title(
-                    "Most Busy year Bar Plot"
-                )
-
-                fig, ax = plt.subplots()
-
-                ax.bar(
-                    timelines["year"],
-                    timelines["message"]
-                )
-
-                plt.xticks(
-                    rotation=90
-                )
-
-                st.pyplot(fig)
-
-
 
     except zipfile.BadZipFile:
 
