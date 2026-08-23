@@ -19,7 +19,7 @@ def fatch_stats(select_user,df):
     links=[]
     for message in df["message"]:
       links.extend(link.find_urls(message)) 
-    return number_message,len(word),media_files,len(links) 
+    return number_message,len(word),media_files,links 
 
 
 
